@@ -3,14 +3,12 @@ services:
     image: postgres:alpine
     container_name: postgres_db
     restart: unless-stopped
+    shm_size: 1gb
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB:-postgres}
       PGDATA: /var/lib/postgresql/data/pgdata
-      # Performance tuning
-      POSTGRES_SHARED_BUFFERS: ${POSTGRES_SHARED_BUFFERS:-256MB}
-      POSTGRES_MAX_CONNECTIONS: ${POSTGRES_MAX_CONNECTIONS:-100}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init:/docker-entrypoint-initdb.d
@@ -20,6 +18,9 @@ services:
     command: >
       postgres
       -c log_statement=mod
+      -c maintenance_work_mem=1GB
+      -c max_wal_size=4GB
+      -c shared_buffers=2GB
       -c log_min_duration_statement=1000
       -c shared_preload_libraries=pg_stat_statements
     healthcheck:
@@ -36,38 +37,8 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: pgadmin
-    restart: unless-stopped
-    user: root
-    entrypoint: /bin/sh -c "chmod 600 /pgpass; /entrypoint.sh;"
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@example.com}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
-      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
-      PGADMIN_SERVER_JSON_FILE: '/pgadmin4/servers.json'
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
-      - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
-      - ./pgadmin/pgpass:/pgpass:ro
-    ports:
-      - "${PGADMIN_PORT:-5050}:80"
-    networks:
-      - postgres_network
-    depends_on:
-      postgres:
-        condition: service_healthy
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 volumes:
   postgres_data:
-    driver: local
-  pgadmin_data:
     driver: local
 
 networks:
