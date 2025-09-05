@@ -23,7 +23,6 @@ desktop.ini
 
 # PostgreSQL data
 postgres_data/
-pgadmin_data/
 /data/
 /pgdata/
 

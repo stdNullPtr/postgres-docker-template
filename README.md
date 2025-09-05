@@ -1,6 +1,6 @@
 # PostgreSQL Docker Template
 
-A production-ready PostgreSQL setup with pgAdmin for database management and automated backup solutions.
+A production-ready PostgreSQL setup with automated backup solutions.
 
 ## Quick Start
 
@@ -16,13 +16,6 @@ A production-ready PostgreSQL setup with pgAdmin for database management and aut
    docker-compose up -d
    ```
 
-4. Access pgAdmin at http://localhost:5050
-    - Email: admin@example.com (configurable via PGADMIN_EMAIL)
-    - Password: your_pgadmin_password_here (configurable via PGADMIN_PASSWORD)
-    - PostgreSQL server connection is automatically preconfigured with saved password
-
-**Note**: Server configuration from `pgadmin/servers.json` is loaded only on first startup. If you need to reset server
-configurations, remove the pgadmin volume: `docker compose down -v`
 
 ## Configuration
 
@@ -34,11 +27,6 @@ configurations, remove the pgadmin volume: `docker compose down -v`
 | `POSTGRES_PASSWORD`     | -                 | Database password (required) |
 | `POSTGRES_DB`           | postgres          | Default database name        |
 | `POSTGRES_PORT`         | 5432              | PostgreSQL port              |
-| `PGADMIN_EMAIL`         | admin@example.com | pgAdmin login email          |
-| `PGADMIN_PASSWORD`      | -                 | pgAdmin password (required)  |
-| `PGADMIN_PORT`          | 5050              | pgAdmin web interface port   |
-| `BACKUP_SCHEDULE`       | 0 2 * * *         | Cron schedule for backups    |
-| `BACKUP_RETENTION_DAYS` | 7                 | Days to keep backups         |
 
 ## Common Commands
 
@@ -51,7 +39,6 @@ docker-compose down
 
 # View logs
 docker-compose logs -f postgres
-docker-compose logs -f pgadmin
 
 # Connect to PostgreSQL
 docker exec -it postgres_db psql -U postgres -d postgres
@@ -154,8 +141,7 @@ docker exec postgres_db pg_dump -U postgres postgres > test-backup.sql
 
 ## Features
 
-- PostgreSQL with pgAdmin web interface
-- Automated backup system with retention policy
+- PostgreSQL with automated backup system
 - Health checks and logging
 - Performance tuning for development and production
 - Common PostgreSQL extensions pre-installed
@@ -171,7 +157,4 @@ docker exec postgres_db pg_dump -U postgres postgres > test-backup.sql
 ├── init/                       # Database initialization scripts
 │   └── 01-extensions.sql       # PostgreSQL extensions setup
 ├── backups/                    # Database backups
-└── pgadmin/                    # pgAdmin configuration
-    ├── servers.json            # Preconfigured server connections
-    └── pgpass                  # Password file for automatic login
 ```
